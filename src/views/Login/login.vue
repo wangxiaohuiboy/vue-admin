@@ -51,12 +51,13 @@
 </template>
  
 <script>
+import { reactive, ref } from "@vue/composition-api";
 export default {
-  data() {
+  setup(props, {refs}) {
     var validatePass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入密码"));
-      } else if (this.ruleForm.checkPass !== "") {
+      } else if (ruleForm.checkPass !== "") {
         $refs.ruleForm.validateField("checkPass");
       } else {
         callback();
@@ -65,55 +66,72 @@ export default {
     var validatorCheckPass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.ruleForm.password) {
+      } else if (value !== ruleForm.password) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
       }
     };
-    return {
-      // 这里放置data数据，生命周期，自定义的函数
-      menuTab: [
-        { txt: "登录", current: true, type: "login" },
-        { txt: "注册", current: false, type: "register" },
+    // 这里放置data数据，生命周期，自定义的函数
+    const menuTab = reactive([
+      { txt: "登录", current: true, type: "login" },
+      { txt: "注册", current: false, type: "register" },
+    ]);
+    // 模块值
+    const model = ref("login");
+    //表单里的数据
+    const ruleForm = reactive({
+      username: "",
+      password: "",
+      code: "",
+      checkPass: "",
+    });
+    // 表单规则;
+    const rules = reactive({
+      username: [
+        { required: true, message: "请输入用户名", trigger: "blur" },
+        {
+          type: "email",
+          message: "请输入正确的邮箱地址",
+          trigger: ["blur", "change"],
+        },
       ],
-      // 模块值
-      model: "login",
-      //表单里的数据
-      ruleForm: {
-        username: "",
-        password: "",
-        code: "",
-        checkPass: "",
-      },
-      // 表单规则;
-      rules: {
-        username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          {
-            type: "email",
-            message: "请输入正确的邮箱地址",
-            trigger: ["blur", "change"],
-          },
-        ],
-        password: [
-          { validator: validatePass, trigger: "blur" },
-          { min: 6, max: 20, message: "长度在3到20个字符", trigger: "blur" },
-        ],
-        checkPass: [{ validator: validatorCheckPass, trigger: "blur" }],
-        code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
-      },
-    };
-  },
-  methods: {
+      password: [
+        { validator: validatePass, trigger: "blur" },
+        { min: 6, max: 20, message: "长度在3到20个字符", trigger: "blur" },
+      ],
+      checkPass: [{ validator: validatorCheckPass, trigger: "blur" }],
+      code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
+    });
     // 声明函数;
-    toggleMenu(data) {
-      this.model = data.type;
-      this.menuTab.forEach((el, idnex) => {
+    const toggleMenu = (data) => {
+      model.value = data.type;
+      menuTab.forEach((el, idnex) => {
         el.current = false;
       });
       data.current = true;
-    },
+    };
+    //提交事件
+    const submitForm = (fromName) => {
+      refs[fromName].validate((valid) => {
+        if (valid) {
+          alert("submit");
+        } else {
+          console.log("error submit");
+          return false;
+        }
+      });
+      console.log(fromName);
+    };
+
+    return {
+      model,
+      menuTab,
+      ruleForm,
+      rules,
+      toggleMenu,
+      submitForm,
+    };
   },
 };
 </script>
