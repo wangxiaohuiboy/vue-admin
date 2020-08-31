@@ -1,19 +1,21 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    redirect: "/login"
+    path: "/",
+    redirect: "login"
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import(/* webpackChunkName: "login" */ '../views/Login/login.vue')
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/Login/login.vue")
   }
 ]
 
-const router = createRouter({
-  history: createWebHashHistory(),
+const router = new VueRouter({
   routes
 })
 
